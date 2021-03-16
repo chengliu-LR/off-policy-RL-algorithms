@@ -8,7 +8,7 @@ import seaborn
 seaborn.set_style('darkgrid')
 
 # hyperparameters
-runs = 2
+runs = 5
 max_episode = 150
 training_data = np.zeros((runs, max_episode))
 # make pendulum environment
