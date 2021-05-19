@@ -24,7 +24,7 @@ TARGET_UPDATE = 20
 n_actions = env.action_space.n
 #steps counter for epsilon annealing
 steps_done = 0
-num_episodes = 10
+num_episodes = 1000
 episode_rewards = np.zeros(num_episodes)
 episode_count = 0
 
@@ -94,9 +94,7 @@ def update_policy():
     #convert the batch-array of transitions to Transition of batch-arrays
     batch = Transition(*zip(*transitions))
     #compute a mask of non-terminal states and concatenate the batch elements
-    non_termi_mask = torch.tensor(tuple(map(lambda s: s is not None,
-                                            batch.next_state)), device=device, 
-                                            dtype=torch.bool)
+    non_termi_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=device, dtype=torch.bool)
                                             
     next_state_batch = torch.cat([s for s in batch.next_state
                                             if s is not None])
@@ -159,9 +157,13 @@ for epoch in range(num_episodes):
         torch.save(policy_net.state_dict(), 'cartpole-trained-model.pt')
         episode_count = epoch
         break
-    print('epoch:', epoch, 'accumulated reward:', episode_rewards[epoch], 'frames:', steps_done)
+
+    if epoch % 10 == 0:
+        print('epoch:', epoch, 'accumulated reward:', episode_rewards[epoch], 'frames:', steps_done)
+
     if epoch % TARGET_UPDATE == 0:
         target_net.load_state_dict(policy_net.state_dict())
+
 
 #plot
 plt.figure(dpi = 500) #set the resolution
